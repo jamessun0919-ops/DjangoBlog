@@ -346,6 +346,64 @@ img { display: block; max-width: 100%; }
   line-height: 1.5;
 }
 
+/* ── Post Form / Login ── */
+.section-post-form,
+.section-login {
+  background: #f5f5f7;
+  color: #1d1d1f;
+  color-scheme: light;
+  padding: 60px 22px 80px;
+}
+
+.section-post-form form,
+.section-login form {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.section-post-form input[type="text"],
+.section-post-form textarea,
+.section-login input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d2d2d7;
+  border-radius: 8px;
+  background: #fff;
+  color: #1d1d1f;
+  font-size: 1rem;
+  margin-top: 6px;
+  margin-bottom: 16px;
+}
+
+.section-post-form label,
+.section-login label {
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.section-post-form button[type="submit"],
+.section-login button[type="submit"] {
+  background: var(--color-link);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.section-post-form button[type="submit"]:hover,
+.section-login button[type="submit"]:hover {
+  background: var(--color-link-hover);
+}
+
+#editor {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
 /* ── Footer ── */
 .footer {
   background: #f5f5f7;

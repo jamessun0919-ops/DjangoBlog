@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block 'content' %}
+<section class="section section-post-form">
+  <h2 class="section-title">發表文章</h2>
+  <form method="post" id="post-form">
+    {% csrf_token %}
+    <p>
+      {{ form.title.label_tag }}
+      {{ form.title }}
+    </p>
+    <div id="editor"></div>
+    {{ form.content }}
+    <button type="submit">發表</button>
+  </form>
+</section>
+
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script>
+  const contentTextarea = document.getElementById('{{ form.content.id_for_label }}');
+  contentTextarea.style.display = 'none';
+
+  const editor = new toastui.Editor({
+    el: document.querySelector('#editor'),
+    height: '400px',
+    initialEditType: 'wysiwyg',
+    previewStyle: 'vertical',
+    initialValue: contentTextarea.value,
+  });
+
+  document.getElementById('post-form').addEventListener('submit', function () {
+    contentTextarea.value = editor.getMarkdown();
+  });
+</script>
+{% endblock 'content' %}
