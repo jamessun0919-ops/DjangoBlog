@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DjangoBlog — 分享技術，記錄生活</title>
+  <style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+    --color-bg: #000;
+    --color-text: #f5f5f7;
+    --color-text-muted: #86868b;
+    --color-link: #2997ff;
+    --color-link-hover: #0077ed;
+    --hero-height: 650px;
+    --nav-height: 44px;
+    --apple-cdn: https://www.apple.com;
+  }
+
+  html { font-size: 17px; -webkit-font-smoothing: antialiased; }
+
+  body {
+    font-family: var(--font-system);
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.47059;
+    letter-spacing: -0.022em;
+  }
+
+  a { color: var(--color-link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  img { display: block; max-width: 100%; }
+
+  /* ── Navigation ── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: var(--nav-height);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .nav-inner {
+    max-width: 1008px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+  }
+
+  .nav-logo {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: none;
+    letter-spacing: -0.03em;
+  }
+
+  .nav-logo:hover { text-decoration: none; opacity: 0.8; }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--color-text); text-decoration: none; }
+
+  /* ── Main ── */
+  .main { width: 100%; overflow: hidden; }
+
+  .section { position: relative; width: 100%; }
+
+  /* ── Hero Tile (Apple section-hero pattern) ── */
+  .section-hero { background: #000; }
+
+  .tile-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: var(--hero-height);
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .theme-dark {
+    background: #000;
+    color: var(--color-text);
+  }
+
+  .tile-link {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: block;
+    text-indent: -9999px;
+    overflow: hidden;
+  }
+
+  .tile-content {
+    position: relative;
+    z-index: 2;
+    padding: 55px 22px 0;
+    pointer-events: none;
+  }
+
+  .tile-content a { pointer-events: auto; }
+
+  .tile-copy-wrapper { margin-bottom: 14px; }
+
+  .tile-eyebrow {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #bf4800;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+
+  .tile-headline {
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    margin-bottom: 6px;
+  }
+
+  .tile-subheadline {
+    font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+    font-weight: 400;
+    color: var(--color-text-muted);
+    letter-spacing: 0.01em;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .tile-cta,
+  .tile-ctas {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 18px;
+  }
+
+  .cta-link,
+  .button {
+    font-size: 1.05rem;
+    color: var(--color-link);
+    text-decoration: none;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .cta-link:hover,
+  .button:hover { color: var(--color-link-hover); text-decoration: underline; }
+
+  .cta-link::after,
+  .button::after {
+    content: " ›";
+    font-size: 1.1em;
+  }
+
+  .button-secondary {
+    color: var(--color-link);
+  }
+
+  /* Apple tile-image-wrapper：產品圖置於底部 */
+  .tile-image-wrapper {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 1008px;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .tile-image-wrapper picture,
+  .tile-image-wrapper img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* ── Feature Grid ── */
+  .section-features {
+    background: #000;
+    padding: 12px 12px 60px;
+  }
+
+  .features-inner {
+    max-width: 1008px;
+    margin: 0 auto;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .feature-tile {
+    position: relative;
+    background: #1d1d1f;
+    border-radius: 18px;
+    min-height: 380px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+
+  .feature-tile:hover { transform: scale(1.01); }
+
+  .feature-tile .tile-link { border-radius: 18px; z-index: 3; }
+
+  .feature-tile .tile-content {
+    padding: 36px 28px 0;
+    text-align: left;
+    pointer-events: none;
+  }
+
+  .feature-tile .tile-content a { pointer-events: auto; }
+
+  .feature-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .feature-desc {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    max-width: 90%;
+  }
+
+  .feature-cta {
+    position: absolute;
+    bottom: 28px;
+    left: 28px;
+    font-size: 0.88rem;
+    color: var(--color-link);
+    z-index: 4;
+    pointer-events: auto;
+  }
+
+  .feature-image-wrapper {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 55%;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .feature-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center bottom;
+  }
+
+  /* ── Articles Preview ── */
+  .section-articles {
+    background: #f5f5f7;
+    color: #1d1d1f;
+    padding: 80px 22px;
+  }
+
+  .articles-inner {
+    max-width: 1008px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-align: center;
+    margin-bottom: 48px;
+    color: #1d1d1f;
+  }
+
+  .article-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    list-style: none;
+  }
+
+  .article-card {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    transition: box-shadow 0.3s;
+  }
+
+  .article-card:hover {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .article-thumb {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #e8e8ed;
+  }
+
+  .article-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .article-body { padding: 24px 28px 28px; }
+
+  .article-date {
+    font-size: 0.75rem;
+    color: #86868b;
+    margin-bottom: 8px;
+  }
+
+  .article-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1d1d1f;
+  }
+
+  .article-excerpt {
+    font-size: 0.88rem;
+    color: #6e6e73;
+    line-height: 1.5;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    background: #f5f5f7;
+    border-top: 1px solid #d2d2d7;
+    padding: 20px 22px;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #6e6e73;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 734px) {
+    .nav-links { display: none; }
+    .features-grid { grid-template-columns: 1fr; }
+    .article-list { grid-template-columns: 1fr; }
+    .tile-cta, .tile-ctas { flex-direction: column; gap: 12px; }
+    :root { --hero-height: 580px; }
+  }
+  </style>
+</head>
+<body>
+
+  <nav class="nav" role="navigation" aria-label="主選單">
+    <div class="nav-inner">
+      <a class="nav-logo" href="/">DjangoBlog</a>
+      <ul class="nav-links">
+        <li><a href="#articles">文章</a></li>
+        <li><a href="#features">特色</a></li>
+        <li><a href="/admin/">管理後台</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <!-- Hero：對應 Apple section-hero > tile-wrapper.theme-dark > tile-link -->
+    <section class="section section-hero" aria-label="主要推薦">
+      <div class="tile-wrapper theme-dark" data-tile-id="hero">
+
+        <a class="tile-link"
+           href="#articles"
+           data-analytics-region="learn more"
+           aria-hidden="true"
+           tabindex="-1">了解更多</a>
+
+        <div class="tile-content">
+          <div class="tile-copy-wrapper">
+            <p class="tile-eyebrow">全新上線</p>
+            <h1 class="tile-headline">DjangoBlog</h1>
+            <p class="tile-subheadline">
+              用 Django 打造的現代化部落格平台。<br>
+              優雅、快速、專為開發者而生。
+            </p>
+          </div>
+          <div class="tile-ctas">
+            <a class="button" href="#articles">閱讀文章</a>
+            <a class="button button-secondary" href="/admin/">開始撰寫</a>
+          </div>
+        </div>
+
+        <!-- Apple CDN：iPhone 17 Pro 首頁 Hero 圖 -->
+        <div class="tile-image-wrapper">
+          <picture>
+            <source
+              srcset="https://www.apple.com/v/home/images/iphone-17-pro/a/hero_iphone_17_pro__dbaaq3mt8u2q_small.jpg,
+                      https://www.apple.com/v/home/images/iphone-17-pro/a/hero_iphone_17_pro__dbaaq3mt8u2q_small_2x.jpg 2x"
+              media="(max-width:734px)" />
+            <source
+              srcset="https://www.apple.com/v/home/images/iphone-17-pro/a/hero_iphone_17_pro__dbaaq3mt8u2q_mediumtall.jpg,
+                      https://www.apple.com/v/home/images/iphone-17-pro/a/hero_iphone_17_pro__dbaaq3mt8u2q_mediumtall_2x.jpg 2x"
+              media="(max-width:1068px) and (min-height:734px)" />
+            <source
+              srcset="https://www.apple.com/v/home/images/iphone-17-pro/a/hero_iphone_17_pro__dbaaq3mt8u2q_medium.jpg,
+                      https://www.apple.com/v/home/images/iphone-17-pro/a/hero_iphone_17_pro__dbaaq3mt8u2q_medium_2x.jpg 2x"
+              media="(max-width:1068px) and (max-height:733px)" />
+            <source
+              srcset="https://www.apple.com/v/home/images/iphone-17-pro/a/hero_iphone_17_pro__dbaaq3mt8u2q_largetall.jpg,
+                      https://www.apple.com/v/home/images/iphone-17-pro/a/hero_iphone_17_pro__dbaaq3mt8u2q_largetall_2x.jpg 2x"
+              media="(min-width:0px) and (min-height:776px)" />
+            <source
+              srcset="https://www.apple.com/v/home/images/iphone-17-pro/a/hero_iphone_17_pro__dbaaq3mt8u2q_large.jpg,
+                      https://www.apple.com/v/home/images/iphone-17-pro/a/hero_iphone_17_pro__dbaaq3mt8u2q_large_2x.jpg 2x"
+              media="(min-width:0px) and (max-height:775px)" />
+            <img
+              src="https://www.apple.com/v/home/images/iphone-17-pro/a/hero_iphone_17_pro__dbaaq3mt8u2q_large.jpg"
+              alt="產品展示圖" />
+          </picture>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Feature Tiles -->
+    <section class="section section-features" id="features" aria-label="平台特色">
+      <div class="features-inner">
+        <div class="features-grid">
+
+          <article class="feature-tile theme-dark">
+            <a class="tile-link" href="#articles" aria-hidden="true" tabindex="-1">探索文章</a>
+            <div class="tile-content">
+              <h2 class="feature-title">高效能架構</h2>
+              <p class="feature-desc">
+                基於 Django 框架，ORM 驅動的資料層設計，
+                讓內容管理既安全又高效。
+              </p>
+            </div>
+            <div class="feature-image-wrapper">
+              <picture>
+                <source
+                  srcset="https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_chip_endframe__d06u2zxywxme_small.jpg,
+                          https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_chip_endframe__d06u2zxywxme_small_2x.jpg 2x"
+                  media="(max-width:734px)" />
+                <source
+                  srcset="https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_chip_endframe__d06u2zxywxme_large.jpg,
+                          https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_chip_endframe__d06u2zxywxme_large_2x.jpg 2x"
+                  media="(min-width:0px)" />
+                <img
+                  src="https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_chip_endframe__d06u2zxywxme_large.jpg"
+                  alt="高效能架構" />
+              </picture>
+            </div>
+            <a class="feature-cta" href="#articles">了解更多 ›</a>
+          </article>
+
+          <article class="feature-tile theme-dark">
+            <a class="tile-link" href="/admin/" aria-hidden="true" tabindex="-1">管理後台</a>
+            <div class="tile-content">
+              <h2 class="feature-title">強大後台管理</h2>
+              <p class="feature-desc">
+                內建 Django Admin，無需額外開發即可
+                發布、編輯與管理所有文章內容。
+              </p>
+            </div>
+            <div class="feature-image-wrapper">
+              <picture>
+                <source
+                  srcset="https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_design_endframe__eu8gj0kqlmoi_small.jpg,
+                          https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_design_endframe__eu8gj0kqlmoi_small_2x.jpg 2x"
+                  media="(max-width:734px)" />
+                <source
+                  srcset="https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_design_endframe__eu8gj0kqlmoi_large.jpg,
+                          https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_design_endframe__eu8gj0kqlmoi_large_2x.jpg 2x"
+                  media="(min-width:0px)" />
+                <img
+                  src="https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_design_endframe__eu8gj0kqlmoi_large.jpg"
+                  alt="強大後台管理" />
+              </picture>
+            </div>
+            <a class="feature-cta" href="/admin/">進入後台 ›</a>
+          </article>
+
+          <article class="feature-tile theme-dark">
+            <a class="tile-link" href="#" aria-hidden="true" tabindex="-1">Markdown 支援</a>
+            <div class="tile-content">
+              <h2 class="feature-title">Markdown 撰寫</h2>
+              <p class="feature-desc">
+                支援 Markdown 語法，專注於內容創作，
+                讓技術文章排版更加輕鬆自如。
+              </p>
+            </div>
+            <div class="feature-image-wrapper">
+              <picture>
+                <source
+                  srcset="https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_zoom_endframe__dyqkn2swjbsm_small.jpg,
+                          https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_zoom_endframe__dyqkn2swjbsm_small_2x.jpg 2x"
+                  media="(max-width:734px)" />
+                <source
+                  srcset="https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_zoom_endframe__dyqkn2swjbsm_large.jpg,
+                          https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_zoom_endframe__dyqkn2swjbsm_large_2x.jpg 2x"
+                  media="(min-width:0px)" />
+                <img
+                  src="https://www.apple.com/v/iphone-17-pro/g/images/overview/highlights/highlights_zoom_endframe__dyqkn2swjbsm_large.jpg"
+                  alt="Markdown 撰寫" />
+              </picture>
+            </div>
+            <a class="feature-cta" href="#">了解更多 ›</a>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Articles Preview -->
+    <section class="section section-articles" id="articles" aria-label="最新文章">
+      <div class="articles-inner">
+        <h2 class="section-title">最新文章</h2>
+        <ul class="article-list">
+
+          <li class="article-card">
+            <div class="article-thumb">
+              <picture>
+                <source
+                  srcset="https://www.apple.com/v/iphone-17-pro/g/images/overview/welcome/hero__bsveixlwbms2_small.jpg,
+                          https://www.apple.com/v/iphone-17-pro/g/images/overview/welcome/hero__bsveixlwbms2_small_2x.jpg 2x"
+                  media="(max-width:734px)" />
+                <source
+                  srcset="https://www.apple.com/v/iphone-17-pro/g/images/overview/welcome/hero__bsveixlwbms2_large.jpg,
+                          https://www.apple.com/v/iphone-17-pro/g/images/overview/welcome/hero__bsveixlwbms2_large_2x.jpg 2x"
+                  media="(min-width:0px)" />
+                <img
+                  src="https://www.apple.com/v/iphone-17-pro/g/images/overview/welcome/hero__bsveixlwbms2_large.jpg"
+                  alt="Django 入門" />
+              </picture>
+            </div>
+            <div class="article-body">
+              <p class="article-date">2026 年 6 月 26 日</p>
+              <h3 class="article-title">Django 入門：建立你的第一個 App</h3>
+              <p class="article-excerpt">
+                從零開始，一步步學習如何使用 Django 建立 Web 應用程式，
+                包含 Model、View、Template 的核心概念。
+              </p>
+            </div>
+          </li>
+
+          <li class="article-card">
+            <div class="article-thumb">
+              <picture>
+                <source
+                  srcset="https://www.apple.com/v/home/images/macbook-air-m5/a/hero_macbook_air_m5__eb1idggd120y_small.jpg,
+                          https://www.apple.com/v/home/images/macbook-air-m5/a/hero_macbook_air_m5__eb1idggd120y_small_2x.jpg 2x"
+                  media="(max-width:734px)" />
+                <source
+                  srcset="https://www.apple.com/v/home/images/macbook-air-m5/a/hero_macbook_air_m5__eb1idggd120y_large.jpg,
+                          https://www.apple.com/v/home/images/macbook-air-m5/a/hero_macbook_air_m5__eb1idggd120y_large_2x.jpg 2x"
+                  media="(min-width:0px)" />
+                <img
+                  src="https://www.apple.com/v/home/images/macbook-air-m5/a/hero_macbook_air_m5__eb1idggd120y_large.jpg"
+                  alt="ORM 實戰" />
+              </picture>
+            </div>
+            <div class="article-body">
+              <p class="article-date">2026 年 6 月 20 日</p>
+              <h3 class="article-title">ORM 實戰：資料庫查詢最佳實踐</h3>
+              <p class="article-excerpt">
+                深入探討 Django ORM 的進階用法，包含 select_related、
+                prefetch_related 以及查詢效能優化技巧。
+              </p>
+            </div>
+          </li>
+
+          <li class="article-card">
+            <div class="article-thumb">
+              <picture>
+                <source
+                  srcset="https://www.apple.com/v/home/images/ipad-air-m4/a/promo_ipad_air_m4__bgcv7t286k8y_small.jpg,
+                          https://www.apple.com/v/home/images/ipad-air-m4/a/promo_ipad_air_m4__bgcv7t286k8y_small_2x.jpg 2x"
+                  media="(max-width:734px)" />
+                <source
+                  srcset="https://www.apple.com/v/home/images/ipad-air-m4/a/promo_ipad_air_m4__bgcv7t286k8y_large.jpg,
+                          https://www.apple.com/v/home/images/ipad-air-m4/a/promo_ipad_air_m4__bgcv7t286k8y_large_2x.jpg 2x"
+                  media="(min-width:0px)" />
+                <img
+                  src="https://www.apple.com/v/home/images/ipad-air-m4/a/promo_ipad_air_m4__bgcv7t286k8y_large.jpg"
+                  alt="部署指南" />
+              </picture>
+            </div>
+            <div class="article-body">
+              <p class="article-date">2026 年 6 月 15 日</p>
+              <h3 class="article-title">部署指南：將 Django 放上雲端</h3>
+              <p class="article-excerpt">
+                完整的部署流程教學，涵蓋 Gunicorn、Nginx 設定，
+                以及常見的 Production 環境注意事項。
+              </p>
+            </div>
+          </li>
+
+          <li class="article-card">
+            <div class="article-thumb">
+              <picture>
+                <source
+                  srcset="https://www.apple.com/v/home/images/iphone-17/a/hero_iphone_17__ekga3xh1n5aq_small.jpg,
+                          https://www.apple.com/v/home/images/iphone-17/a/hero_iphone_17__ekga3xh1n5aq_small_2x.jpg 2x"
+                  media="(max-width:734px)" />
+                <source
+                  srcset="https://www.apple.com/v/home/images/iphone-17/a/hero_iphone_17__ekga3xh1n5aq_large.jpg,
+                          https://www.apple.com/v/home/images/iphone-17/a/hero_iphone_17__ekga3xh1n5aq_large_2x.jpg 2x"
+                  media="(min-width:0px)" />
+                <img
+                  src="https://www.apple.com/v/home/images/iphone-17/a/hero_iphone_17__ekga3xh1n5aq_large.jpg"
+                  alt="前端整合" />
+              </picture>
+            </div>
+            <div class="article-body">
+              <p class="article-date">2026 年 6 月 10 日</p>
+              <h3 class="article-title">前端整合：Template 與靜態資源管理</h3>
+              <p class="article-excerpt">
+                學習如何在 Django 中有效管理 HTML 模板與 CSS、
+                JavaScript 靜態檔案，打造美觀的使用者介面。
+              </p>
+            </div>
+          </li>
+
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>Copyright © 2026 DjangoBlog. 保留一切權利。</p>
+  </footer>
+
+</body>
+</html>

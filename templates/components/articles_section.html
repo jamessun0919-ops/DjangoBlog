@@ -1,0 +1,10 @@
+<section class="section section-articles" id="articles" aria-label="最新文章">
+  <div class="articles-inner">
+    <h2 class="section-title">最新文章</h2>
+    <ul class="article-list">
+      {% for post in posts %}
+        {% include "components/article_card.html" with post=post %}
+      {% endfor %}
+    </ul>
+  </div>
+</section>
