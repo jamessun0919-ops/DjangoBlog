@@ -1,0 +1,12 @@
+<html>
+    <head>
+        {% include "components/header.html" %}
+    </head>
+    <body>
+        <h1> Welcome to James Sun's Blog </h1>
+        <hr>
+        {% block 'content' %}{% endblock %}
+        {% include "components/footer.html" %}
+    </body>
+</html>
+

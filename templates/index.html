@@ -1,18 +1,11 @@
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title> Django CMS </title>
-    </head>
-    <body>
-        <h1> Welcome to MyBlog </h1>
-        <hr>
-        {{ posts }}
-        {% for post in posts %}
-            <h1>{{post.title}}</h1>
-            <small>{{post.content}}</small>
-            <h6>{{post.slug}} | {{post.pub_date}} </h6>
-            <hr/>
-        {% endfor %}
-        <h3>現在時間: {{ now }}</h3>
-    </body>
-</html>
+{% extends "base.html" %}
+
+
+{% block 'content' %}
+    {% for post in posts %}
+        <h1> {{ post.title }}</h1>
+        <small> {{ post.content }} </small>
+        <hr/>
+        <h6> {{ post.slug }} | {{post.pub_date}} </h6>
+    {% endfor %}
+{% endblock 'content' %}
