@@ -4,7 +4,7 @@
 :: =====================================================================
 
 :: Google Drive File ID for db.sqlite3
-set "FILE_ID=你的FILE_ID"
+set "FILE_ID=1Jb6W-_iIVopt0fSkDbeLBlw9w0qsxKk7"
 
 :: Local path where the database will be saved
 set "DB_PATH=%~dp0db.sqlite3"
